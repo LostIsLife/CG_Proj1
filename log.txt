@@ -1,0 +1,22 @@
+Tipo de Jogo:
+	https://www.youtube.com/watch?v=rRZGV9Jq8A0
+	https://www.youtube.com/watch?v=PK0_Rpw5w9M
+
+Competencias:
+	Cor
+	Luz
+	Colisões
+	Velocidade
+	Rotações
+
+Trabalho
+
+	Textura
+	Mapa Dinamico
+	Lighting
+	
+	Character Motion
+	Posicionar no inicio
+	Perceber final
+
+
