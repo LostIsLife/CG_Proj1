@@ -19,4 +19,9 @@ Trabalho
 	Posicionar no inicio
 	Perceber final
 
+Sprint 2
+	Camera Glitch
+	Textures
+	Begin Game 
+	End Game
 

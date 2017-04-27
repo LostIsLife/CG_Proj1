@@ -180,7 +180,7 @@ vec3d gm_get_player_coords(game_map target)
 					return create_vec3d( (ndcicle+1) * target.map.tam + target.map.tam / 2, (1+rdcicle) * target.map.tam + target.map.tam / 2, (1+cicle) * target.map.tam + target.map.tam / 2);
 			*/
 				if (target.map.el[ndcicle][rdcicle][cicle] == 4)
-					return create_vec3d( (ndcicle) * target.map.tam - target.map.tam / 2, (rdcicle) * target.map.tam + target.map.tam / 2, (cicle) * target.map.tam + target.map.tam / 2);
+					return create_vec3d( (ndcicle) * target.map.tam + target.map.tam / 2, (rdcicle) * target.map.tam + target.map.tam / 2, (cicle) * target.map.tam + target.map.tam / 2);
 
 
 	return create_vec();
@@ -196,7 +196,7 @@ vec3d gm_get_player_coords_xyz(game_map target)
 	return create_vec();
 }
 
-void gm_turn_character_left( game_map* target )
+void gm_turn_character_right( game_map* target )
 {
 	// Foward to left
 	if (vec_equal3d( target->orientation, 1.0, 0.0, 0.0)) 
@@ -214,7 +214,7 @@ void gm_turn_character_left( game_map* target )
 	else vec_assign( &target->orientation, 1.0, 0.0, 0.0);
 }
 
-void gm_turn_character_right( game_map* target )
+void gm_turn_character_left( game_map* target )
 {
 	// Foward to right
 	if ( vec_equal3d( target->orientation, 1.0, 0.0, 0.0) )

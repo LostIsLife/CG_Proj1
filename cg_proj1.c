@@ -1,4 +1,5 @@
 #include "cg_proj1.h"
+#include "bmp_loader.h"
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <GL/glut.h>
@@ -10,59 +11,84 @@
 int debug = 1;
 vec3d camera;
 game_map* game = NULL;
+GLuint textureID;
+bmp texture;
+
+void load_texture()
+{
+	texture = new_bmp("./texture.bmp");
+	
+	if ( parse_file(&texture,debug) != 0)
+	{
+		printf ("Error reading texture.\n");
+		return;
+	}
+
+	glGenTextures(1, &textureID);
+
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glTexImage2D( GL_TEXTURE_2D,0, GL_RGB, texture.width, texture.height, 0, GL_BGR, GL_UNSIGNED_BYTE, texture.data);
+
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+	//bmp_print(texture);
+
+	glFinish();
+}
 
 void draw_cube( vec3d max, vec3d min, vec3d color)
 {
 	glPolygonMode (GL_FRONT_AND_BACK, GL_LINE);
 	
-	glColor3f( color.x, color.y, color.z);
+	//glColor3f( color.x, color.y, color.z);
 
 	glBegin(GL_POLYGON);
 		//Face 1
-		glVertex3f(  min.x ,  min.y ,  max.z );
-		glVertex3f(  max.x ,  min.y ,  max.z );
-		glVertex3f(  max.x ,  min.y ,  min.z );
-		glVertex3f(  min.x ,  min.y ,  min.z );
+		glTexCoord2f( 0.0, 1.0); glVertex3f(  min.x ,  min.y ,  max.z );
+		glTexCoord2f( 1.0, 1.0); glVertex3f(  max.x ,  min.y ,  max.z );
+		glTexCoord2f( 1.0, 0.0); glVertex3f(  max.x ,  min.y ,  min.z );
+		glTexCoord2f( 0.0, 0.0); glVertex3f(  min.x ,  min.y ,  min.z );
 	glEnd();
 
 	glBegin(GL_POLYGON);
 		//Face 2
-		glVertex3f(  min.x ,  min.y ,  max.z );
-		glVertex3f(  max.x ,  min.y ,  max.z );
-		glVertex3f(  max.x ,  max.y ,  max.z );
-		glVertex3f(  min.x ,  max.y ,  max.z );
+		glTexCoord2f(0.0, 0.0); glVertex3f(  min.x ,  min.y ,  max.z );
+		glTexCoord2f(1.0, 0.0); glVertex3f(  max.x ,  min.y ,  max.z );
+		glTexCoord2f(1.0, 1.0); glVertex3f(  max.x ,  max.y ,  max.z );
+		glTexCoord2f(0.0, 1.0); glVertex3f(  min.x ,  max.y ,  max.z );
 	glEnd();
 
 	glBegin(GL_POLYGON);
 		//Face 3
-		glVertex3f(  max.x ,  min.y ,  min.z );
-		glVertex3f(  min.x ,  min.y ,  min.z );
-		glVertex3f(  min.x ,  max.y ,  min.z );
-		glVertex3f(  max.x ,  max.y ,  min.z );
+		glTexCoord2f(1.0,0.0); glVertex3f(  max.x ,  min.y ,  min.z );
+		glTexCoord2f(0.0,0.0); glVertex3f(  min.x ,  min.y ,  min.z );
+		glTexCoord2f(0.0,1.0); glVertex3f(  min.x ,  max.y ,  min.z );
+		glTexCoord2f(1.0,1.0); glVertex3f(  max.x ,  max.y ,  min.z );
 	glEnd();
 
 	glBegin(GL_POLYGON);
 		//Face 4
-		glVertex3f(  min.x ,  min.y ,  max.z );
-		glVertex3f(  min.x ,  min.y ,  min.z );
-		glVertex3f(  min.x ,  max.y ,  min.z );
-		glVertex3f(  min.x ,  max.y ,  max.z );
+		glTexCoord2f(0.0,1.0); glVertex3f(  min.x ,  min.y ,  max.z );
+		glTexCoord2f(0.0,0.0); glVertex3f(  min.x ,  min.y ,  min.z );
+		glTexCoord2f(1.0,0.0); glVertex3f(  min.x ,  max.y ,  min.z );
+		glTexCoord2f(1.0,1.0); glVertex3f(  min.x ,  max.y ,  max.z );
 	glEnd();
 
 	glBegin(GL_POLYGON);
 		//Face 5
-		glVertex3f(  max.x ,  min.y ,  max.z );
-		glVertex3f(  max.x ,  min.y ,  min.z );
-		glVertex3f(  max.x ,  max.y ,  min.z );
-		glVertex3f(  max.x ,  max.y ,  max.z );
+		glTexCoord2f(0.0,1.0); glVertex3f(  max.x ,  min.y ,  max.z );
+		glTexCoord2f(0.0,0.0); glVertex3f(  max.x ,  min.y ,  min.z );
+		glTexCoord2f(1.0,0.0); glVertex3f(  max.x ,  max.y ,  min.z );
+		glTexCoord2f(1.0,1.0); glVertex3f(  max.x ,  max.y ,  max.z );
 	glEnd();
 
 	glBegin(GL_POLYGON);
 		//Face 6
-		glVertex3f(  min.x ,  max.y ,  max.z );
-		glVertex3f(  max.x ,  max.y ,  max.z );
-		glVertex3f(  max.x ,  max.y ,  min.z );
-		glVertex3f(  min.x ,  max.y ,  min.z );
+		glTexCoord2f(1.0,0.0); glVertex3f(  min.x ,  max.y ,  max.z );
+		glTexCoord2f(1.0,1.0); glVertex3f(  max.x ,  max.y ,  max.z );
+		glTexCoord2f(0.0,1.0); glVertex3f(  max.x ,  max.y ,  min.z );
+		glTexCoord2f(0.0,0.0); glVertex3f(  min.x ,  max.y ,  min.z );
 	glEnd();
 }
 
@@ -136,6 +162,9 @@ void display()
 	int fow = 100;
 	printf("Display Callback Function Activated\n");
 
+   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	vec3d player = gm_get_player_coords(*game);
@@ -186,6 +215,8 @@ void init_gl(int argc, char** argv)
 	glutInitWindowSize( 600, 600);
 	glutCreateWindow(" Mazé by V1l3l45 & Chr15t1an ");
 
+	glEnable(GL_TEXTURE_2D);
+	load_texture();
 	glClearColor( 0.0, 0.0, 0.0 ,0.0);
 	glClear (GL_COLOR_BUFFER_BIT);
 

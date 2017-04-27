@@ -16,8 +16,9 @@ typedef struct
 } bmp;
 
 bmp new_bmp( char* n_filename );
-int error_check(bmp target, int verbose);
-int parse_file(bmp target, int verbose);
-
+int error_check(bmp* target, int verbose);
+int parse_file(bmp* target, int verbose);
+void bmp_print_data(bmp);
+void bmp_print (bmp);
 
 #endif
