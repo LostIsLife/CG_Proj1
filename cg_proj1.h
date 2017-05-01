@@ -3,6 +3,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+#define START_POINT 2
+#define FINAL_POINT 3
+#define FOG_DENSITY 0.35
 
 /* HEADER PART */
 
@@ -39,6 +44,11 @@ matrix matrix_test_level_o();
 vec3d create_vec();
 vec3d create_vec3d(double, double, double);
 
+int rand_to( int);
+void gm_gen2dMap( game_map*, int );
+void gm_ramifyMap( game_map *, int);
+void gm_simplify( game_map*, int );
+
 /* Code Part */
 
 
@@ -51,6 +61,8 @@ matrix create_matrix()
 	result.z = 0;
 	result.tam = 1;
 	result.el = NULL;
+
+	srand(time(NULL));
 }
 
 
@@ -60,7 +72,7 @@ matrix create_matrix3i(int new_x, int new_y, int new_z)
 	matrix result;
 	result.x = new_x;
 	result.y = new_y;
-	result.z = new_z;
+	result.z = new_z + 2;
 	result.tam = 5;
 
 	result.el = malloc(sizeof(int**) * new_x);
@@ -282,6 +294,115 @@ void gm_simplify_map ( game_map* target )
 
 }
 
+int rand_to( int limit ) { return rand() % limit; }
+
+void gm_choose_spot(game_map* target, int* x, int* y, int* z, int verbose)
+{
+	int possible_x, possible_y, possible_z;
+
+	while(1)
+	{
+		possible_x = rand_to(target->map.x - 2) + 1;
+		possible_y = rand_to(target->map.y - 2) + 1;
+		possible_z = rand_to(target->map.z - 2) + 1;
+
+		if (verbose) printf ("Possible Spot: %d,%d,%d\n", possible_x, possible_y, possible_z);
+
+		if( 
+			target->map.el[possible_x - 1][possible_y][possible_z] == 0 ||
+			target->map.el[possible_x + 1][possible_y][possible_z] == 0 ||
+			target->map.el[possible_x][possible_y - 1][possible_z] == 0 ||
+			target->map.el[possible_x][possible_y + 1][possible_z] == 0 ||
+			target->map.el[possible_x][possible_y][possible_z - 1] == 0 ||
+			target->map.el[possible_x][possible_y][possible_z + 1] == 0
+		  )
+			continue;
+		
+		*x = possible_x;
+		*y = possible_y;
+		*z = possible_z;
+
+		return;
+	}
+}
+
+void gm_gen2dMap( game_map* target, int verbose )
+{
+	srand(time(NULL));
+
+	int history[2] = { 0,0 };
+	int x = 0, y = 0, z = 0, 
+		 limit = rand_to( target->map.x * target->map.y), 
+		 r = 0, inv_r = 0,
+		 player_placed = 0,
+		 signal = 0;
+
+	gm_choose_spot( target, &x, &y, &z, verbose);
+	
+	target->map.el[x][y][z] = START_POINT;
+
+	if (verbose) printf ("LIMIT: %d\n", limit);
+
+	for (int cicle = 0; cicle < limit; cicle++)
+	{
+		if( verbose) printf ("Cicle: %d\n", cicle);
+
+		while(1)
+		{
+			r = rand_to(4) - 2; 
+			inv_r = -1 * r;
+
+			if (verbose) printf ("X,Y,Z = (%d,%d,%d)\n R:%d \n", x,y,z,r);
+
+			// direction can't be 0 and cannot be the inverse of the last two directions
+			if(
+				r == 0 ||
+				history[0] == inv_r ||
+				history[1] == inv_r
+			) continue;
+
+			//Check if out of boundaries, if yes calculate again, else break the infinite loop
+
+			switch(r)
+			{
+				case -2: { if ( x < target->map.x - 2){ signal = 1; x++; break; } }
+				case -1: { if ( x > 2) { signal = 1; x--; break; } }
+				case 1:  { if ( y < target->map.y - 2) { signal = 1; y++; break; } }
+				case 2:  { if ( y > 2) { signal = 2; y--; break; } }
+				default: continue;
+			}
+			if (signal == 1)
+			{
+				signal = 0;
+				break;
+			}
+		}
+
+		history[0] = history[1];
+		history[1] = r;
+
+		if (player_placed)
+			target->map.el[x][y][z] = 0;
+		else 
+		{
+			target->map.el[x][y][z] = 4;
+			player_placed = 1;
+		}
+
+	}
+
+		target->map.el[x][y][z] = FINAL_POINT;
+}
+
+void gm_ramifyMap( game_map * target, int verbose)
+{
+
+}
+
+void gm_simplify( game_map* target, int verbose)
+{
+
+}
 
 #endif
 
